@@ -1,5 +1,5 @@
 # mqtt2sony_ta-sa2
-Listen to MQTT topics and convert them to IR codes (SIRCS) so that
+Listen to MQTT topics and convert them to IR codes (SIRCS) so that 
 the old stereo can be use remote controlled using a smartphone
 
 Since I haven't used WiFiManager yet I created a little wlan.cfg file which is not git managed
@@ -10,6 +10,7 @@ It should have this content:
     '-DMQTT_HOST="mqtt.localnet"'
 
 These 12 bit IR commands seem to work (found under a remote repository which I don't remember)
+
     KEY_POWER                0x0000000000000A81        #  Was: power
     KEY_TAPE                 0x0000000000000C41        #  Was: tape
     tape-a-fast-rew          0x0000000000000CC1
@@ -93,4 +94,5 @@ These 12 bit IR commands seem to work (found under a remote repository which I d
     memory                   0x0000000000000709
     KEY_VOLUMEUP             0x0000000000000481        #  Was: vol+
     KEY_VOLUMEDOWN           0x0000000000000C81        #  Was: vol-
+
 
