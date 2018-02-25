@@ -4,7 +4,7 @@
 #include <Ticker.h>
 #include <AsyncMqttClient.h>
 
-#include "Sony_TA-SA2.hpp"
+#include "Sony_TA-S2.hpp"
 
 constexpr auto MQTT_PORT = 1883;
 
@@ -89,7 +89,7 @@ void setup() {
   Serial.begin(115200);
   Serial.println();
   Serial.println();
-  sony::getIRSend();
+  sony::getIRSend().begin();
 
   wifiConnectHandler = WiFi.onStationModeGotIP(onWifiConnect);
   wifiDisconnectHandler = WiFi.onStationModeDisconnected(onWifiDisconnect);

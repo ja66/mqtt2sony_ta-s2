@@ -28,6 +28,19 @@
             "problemMatcher": [
                 "$platformio"
             ]
+        },
+        {
+            "type": "PlatformIO",
+            "args": [
+                "run",
+                "--target",
+                "upload",
+                "--target",
+                "monitor"
+            ],
+            "problemMatcher": [
+                "$platformio"
+            ]
         }
     ]
 }

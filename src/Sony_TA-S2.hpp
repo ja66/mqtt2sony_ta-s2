@@ -1,43 +1,14 @@
+#pragma once
 
-#include "Sony_TA-SA2.hpp"
-
-#include <Arduino.h>
 #include <IRsend.h>
-
-#include <utility/util.h>
-#include <utility>
+#include <map>
+#include <WString.h>
+#include <functional>
 
 namespace sony {
-
-    const Topics_t & getTopics() {
-        static Topics_t topics{
-            std::make_pair("sony.ta-sa2.power"  , sendPower),
-            std::make_pair("sony.ta-sa2.volume" , sendVolume),
-            std::make_pair("sony.ta-sa2.input"  , sendInput)
-        };
-        return topics;
-    }
-
-    IRsend &getIRSend()
-    {
-        constexpr uint16_t IR_PIN = 2;
-        static IRsend irSender(IR_PIN);
-        return irSender;
-    }
-
-    namespace rm_s1 {
-        template<uint16_t NumBits, uint64_t Command>
-        struct GenericIRCommand {
-
-            static constexpr uint16_t repeatCount  = 3;
-
-            void operator()() const {
-                getIRSend().sendSony(Command, NumBits, repeatCount);
-            }
-        };
-
-        template<uint16_t Command>
-        using IRCommand  = GenericIRCommand<12, Command>;
+    using Payload   = uint64_t;
+    using SendFn_t  = std::function<void(Payload)>;
+    using Topics_t  = std::map<String, SendFn_t>;
 
         //   KEY_POWER                0x0000000000000A81        #  Was: power
         //   KEY_TAPE                 0x0000000000000C41        #  Was: tape
@@ -123,110 +94,30 @@ namespace sony {
         //   KEY_VOLUMEUP             0x0000000000000481        #  Was: vol+
         //   KEY_VOLUMEDOWN           0x0000000000000C81        #  Was: vol-
 
+    const Topics_t & getTopics();
 
-        using Power      = IRCommand< 0x0000000000000A81ULL >;
-        using VolumeUp   = IRCommand< 0x0000000000000481ULL >;
-        using VolumeDn   = IRCommand< 0x0000000000000C81ULL >;
-        using InputTuner = IRCommand< 0x0000000000000481ULL >;
-        using InputDat   = IRCommand< 0x0000000000000621ULL >;
-        using InputCD    = IRCommand< 0x0000000000000A41ULL >;
-        using InputTape  = IRCommand< 0x0000000000000C41ULL >;
-        using InputPhono = IRCommand< 0x0000000000000041ULL >;
 
-        Payload asPayload(const uint8_t *p) {
-            Payload result = htonl(*reinterpret_cast<const uint32_t *>(p));
-            result <<= 32;
-            result |= htonl(*reinterpret_cast<const uint32_t *>(p + 4));
-        }
-    } // end namespace rm_s1
-
-    /*
-     *
-    Publish received
-    topic: sony.ta-sa2.power
-    qos: 1
-    dup: 0
-    retain: 0
-    len: 1
-    index: 0
-    total: 1
-    Publish received.
-    topic: sony.ta-sa2.power
-    qos: 1
-    dup: 0
-    retain: 0
-    len: 1
-    index: 0
-    total: 1
-    Publish received.
-    topic: sony.ta-sa2.input
-    qos: 1
-    dup: 0
-    retain: 0
-    len: 2
-    index: 0
-    total: 2
-    Publish received.
-    topic: sony.ta-sa2.input
-    qos: 1
-    dup: 0
-    retain: 0
-    len: 5
-    index: 0
-    total: 5
-    Publish received.
-    topic: sony.ta-sa2.volume
-    qos: 1
-    dup: 0
-    retain: 0
-    len: 2
-    index: 0
-    total: 2
+    /**
+     * Get global instance of IRSend
+     * @return IRSend reference
      */
-    void forwardTopic(const char * topic, const char * payload, size_t len) {
-        static const auto end = getTopics().end();
-        auto iter = getTopics().find(topic);
-        if(iter == end) {
-            Serial.print("ERROR: Topic not found: ");
-            Serial.println(topic);
-            return;
-        }
-        auto & fn = iter->second;
-        fn(payload, len);
+    IRsend & getIRSend();
 
-    }
+    /**
+     * Send Payload via IR
+     * @param Payload
+     */
+    void sendIr(Payload payload);
 
-
-    void sendPower(const char * /*p*/, size_t /*len*/) {
-        rm_s1::Power();
-    }
-
-    void sendInput(const char * p, size_t len) {
-        const String input(*reinterpret_cast<const uint8_t *>(p), HEX);
-        Serial.print("Input:");
-        Serial.println(input);
-
-        if(memcmp(p, "Tuner", len) == 0) {
-            rm_s1::InputTuner();
-        } else if(memcmp(p, "CD", len) == 0) {
-            rm_s1::InputCD();
-        } else if(memcmp(p, "Aux", len) == 0) {
-            rm_s1::InputDat();
-        } else if(memcmp(p, "Phono", len) == 0) {
-            rm_s1::InputPhono();
+    template<typename Callback>
+    void subscribe(Callback && callback) {
+        for (const auto & t : getTopics())
+        {
+            std::forward<Callback>(callback)(t.first.c_str());
         }
     }
 
-    void sendVolume(const char * p, size_t len) {
-        const String input(*reinterpret_cast<const uint32_t*>(p), HEX);
-        Serial.print("Volume: 0x");
-        Serial.println(input);
-
-        // this is a bit tricky: I get a number or the desired
-        // volume but cannot know the initial volume.
-        // To change volume the commands rm_s1::[VolumeUp(),VolumeDn()]
-        // have to be repeated until the desired volume is reached.
-        // Ah!, I could interpret the number as change request...
-    }
+    void forwardTopic(const char * topic, const char * payload, size_t len);
 
 }
+
