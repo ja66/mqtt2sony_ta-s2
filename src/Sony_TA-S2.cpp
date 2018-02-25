@@ -11,10 +11,7 @@ namespace sony {
 
     const Topics_t & getTopics() {
         static Topics_t topics{
-            std::make_pair("sony.ta-s2.power"    , sendIr),
-            std::make_pair("sony.ta-s2.volumeUp" , sendIr),
-            std::make_pair("sony.ta-s2.volumeDn" , sendIr),
-            std::make_pair("sony.ta-s2.input"    , sendIr)
+            std::make_pair("sony.ta-s2.remote"   , sendIr),
         };
         return topics;
     }
