@@ -9,13 +9,6 @@
 
 namespace sony {
 
-    const Topics_t & getTopics() {
-        static Topics_t topics{
-            std::make_pair("sony.ta-s2.remote"   , sendIr),
-        };
-        return topics;
-    }
-
     IRsend &getIRSend()
     {
         constexpr uint16_t IR_PIN = 4;
@@ -36,24 +29,21 @@ namespace sony {
 
         using IRCommand = GenericIRCommand<12>;
 
+        void sendIr(uint64_t value) {
+            rm_s1::IRCommand{}(value);
+        }
     } // end namespace rm_s1
 
+    const char * getTopic() {
+        static const char * svTopic = "sony.ta-s2.remote";
+        return svTopic;
+    }
+
+
     void forwardTopic(const char * topic, const char * payload, size_t len) {
-        static const auto end = getTopics().end();
-        auto iter = getTopics().find(topic);
-        if(iter == end) {
-            Serial.print("ERROR: Topic not found: ");
-            Serial.println(topic);
-            return;
-        }
         const Payload value = static_cast<Payload>(String(payload).toInt());
-        auto & fn = iter->second;
-        fn(value);
+        rm_s1::sendIr(value);
     }
 
-
-    void sendIr(uint64_t value) {
-        rm_s1::IRCommand{}(value);
-    }
 
 }

@@ -41,7 +41,7 @@ void onMqttConnect(bool sessionPresent) {
     Serial.println("Connected to MQTT.");
     Serial.print("Session present: ");
     Serial.println(sessionPresent);
-    sony::subscribe([] (const char * topic) { mqttClient.subscribe(topic, 1); });
+    mqttClient.subscribe(sony::getTopic(), 1);
 }
 
 void onMqttDisconnect(AsyncMqttClientDisconnectReason reason) {
