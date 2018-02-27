@@ -1,13 +1,9 @@
 #pragma once
 
 #include <IRsend.h>
-#include <map>
-#include <WString.h>
-#include <functional>
+#include <cstddef>
 
 namespace sony {
-    using Payload   = uint64_t;
-
     /**
      * Get global instance of IRSend
      * @return IRSend reference

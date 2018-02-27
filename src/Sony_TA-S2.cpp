@@ -4,10 +4,12 @@
 #include <Arduino.h>
 #include <IRsend.h>
 
-#include <utility/util.h>
-#include <utility>
-
 namespace sony {
+
+    namespace {
+        using Payload   = uint64_t;
+    }
+
 
     IRsend &getIRSend()
     {
