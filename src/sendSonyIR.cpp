@@ -45,8 +45,8 @@ void onMqttConnect(bool sessionPresent) {
 }
 
 void onMqttDisconnect(AsyncMqttClientDisconnectReason reason) {
-  Serial.println("Disconnected from MQTT.");
-
+  Serial.print("Disconnected from MQTT, reason:");
+  Serial.println(static_cast<int8_t>(reason));
   if (WiFi.isConnected()) {
     mqttReconnectTimer.once(2, connectToMqtt);
   }
@@ -67,21 +67,20 @@ void onMqttUnsubscribe(uint16_t packetId) {
 }
 
 void onMqttMessage(char* topic, char* payload, AsyncMqttClientMessageProperties properties, size_t len, size_t index, size_t total) {
-  Serial.println("Publish received.");
-  Serial.print("  topic: ");
+  Serial.println("topic received.");
   Serial.println(topic);
-  Serial.print("  qos: ");
-  Serial.println(properties.qos);
-  Serial.print("  dup: ");
-  Serial.println(properties.dup);
-  Serial.print("  retain: ");
-  Serial.println(properties.retain);
-  Serial.print("  len: ");
-  Serial.println(len);
-  Serial.print("  index: ");
-  Serial.println(index);
-  Serial.print("  total: ");
-  Serial.println(total);
+  // Serial.print("  qos: ");
+  // Serial.println(properties.qos);
+  // Serial.print("  dup: ");
+  // Serial.println(properties.dup);
+  // Serial.print("  retain: ");
+  // Serial.println(properties.retain);
+  // Serial.print("  len: ");
+  // Serial.println(len);
+  // Serial.print("  index: ");
+  // Serial.println(index);
+  // Serial.print("  total: ");
+  // Serial.println(total);
   sony::forwardTopic(topic, payload, len);
 }
 
