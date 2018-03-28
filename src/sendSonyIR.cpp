@@ -67,8 +67,10 @@ void onMqttUnsubscribe(uint16_t packetId) {
 }
 
 void onMqttMessage(char* topic, char* payload, AsyncMqttClientMessageProperties properties, size_t len, size_t index, size_t total) {
-  Serial.println("topic received.");
-  Serial.println(topic);
+  Serial.print("topic: ");
+  Serial.print(topic);
+  Serial.print(" ");
+  Serial.println(payload);
   // Serial.print("  qos: ");
   // Serial.println(properties.qos);
   // Serial.print("  dup: ");
@@ -85,22 +87,22 @@ void onMqttMessage(char* topic, char* payload, AsyncMqttClientMessageProperties 
 }
 
 void setup() {
-  Serial.begin(115200);
-  Serial.println();
-  Serial.println();
-  sony::getIRSend().begin();
+    Serial.begin(115200);
+    Serial.println();
+    Serial.println();
+    sony::getIRSend().begin();
 
-  wifiConnectHandler = WiFi.onStationModeGotIP(onWifiConnect);
-  wifiDisconnectHandler = WiFi.onStationModeDisconnected(onWifiDisconnect);
+    wifiConnectHandler = WiFi.onStationModeGotIP(onWifiConnect);
+    wifiDisconnectHandler = WiFi.onStationModeDisconnected(onWifiDisconnect);
 
-  mqttClient.onConnect(onMqttConnect);
-  mqttClient.onDisconnect(onMqttDisconnect);
-  // mqttClient.onSubscribe(onMqttSubscribe);
-  // mqttClient.onUnsubscribe(onMqttUnsubscribe);
-  mqttClient.onMessage(onMqttMessage);
-  mqttClient.setServer(MQTT_HOST, MQTT_PORT);
-  delay(100);
-  connectToWifi();
+    mqttClient.onConnect(onMqttConnect);
+    mqttClient.onDisconnect(onMqttDisconnect);
+    // mqttClient.onSubscribe(onMqttSubscribe);
+    // mqttClient.onUnsubscribe(onMqttUnsubscribe);
+    mqttClient.onMessage(onMqttMessage);
+    mqttClient.setServer(MQTT_HOST, MQTT_PORT);
+    delay(100);
+    connectToWifi();
 }
 
 void loop() {

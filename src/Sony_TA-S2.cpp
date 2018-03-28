@@ -22,7 +22,7 @@ namespace sony {
         template<uint16_t NumBits>
         struct GenericIRCommand {
             void operator()(uint64_t Command) const {
-                static constexpr uint16_t repeatCount  = 3;
+                static constexpr uint16_t repeatCount  = 2;
                 Serial.print("GenericIRCommand: 0x");
                 Serial.println(static_cast<uint32_t>(Command), HEX);
                 getIRSend().sendSony(Command, NumBits, repeatCount);
@@ -37,7 +37,7 @@ namespace sony {
     } // end namespace rm_s1
 
     const char * getTopic() {
-        static const char * svTopic = "sony.ta-s2.remote";
+        static const char * svTopic = "sony/ta-s2/remote";
         return svTopic;
     }
 

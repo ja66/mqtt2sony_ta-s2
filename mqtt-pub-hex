@@ -1,0 +1,14 @@
+#!/bin/bash
+#
+# Sequentially publish decimal converted hex codes from a lircd.conf file
+# via mqtt
+# 
+LIRC_CONF=${1:-'RM-S160.lircd.conf'}
+MQTT_HOST=${2:-'127.0.0.1'}
+TOPIC=${3:-'sony/ta-s2/remote'}
+for i in `cat ${LIRC_CONF} | awk -r  '/[[:xdigit:]]{16}/ {print $2}' | tail -n +6`; do 
+    CODE=$(($i))    
+    mosquitto_pub -h ${MQTT_HOST} -t ${TOPIC} -q 1 -m "${CODE}"
+    sleep 1  
+done
+
