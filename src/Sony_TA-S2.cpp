@@ -29,7 +29,7 @@ namespace sony {
             }
         };
 
-        using IRCommand = GenericIRCommand<12>;
+        using IRCommand = GenericIRCommand<11>;
 
         void sendIr(uint64_t value) {
             rm_s1::IRCommand{}(value);
